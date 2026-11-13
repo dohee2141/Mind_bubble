@@ -2,7 +2,7 @@
 <title>마음버블서점 - 당신의 마음을 비우고 채우다</title>
 <meta name="description" content="마음을 비우고, 원하는 만큼 채워가세요. 지금 마음을 한 문장으로 적거나 감정 버튼을 고르면, 그 마음에 맞는 책 세 권을 골라 드려요.">
 <link rel="canonical" href="https://mind-bubble-rest.github.io/%EA%B0%90%EC%A0%95%EC%B1%85%EB%B0%A9.html">
-<meta name="theme-color" content="#fdf8f5">
+<meta name="theme-color" content="#cfe7f6">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -41,8 +41,14 @@
   --bg:#1e1a1a; --surface:#292323; --ink:#f2e9e6; --muted:#b4a6a1; --line:#3b3231;
   --accent:#ee9ab2; --accent-ink:#2a1a1f; --accent-soft:#45282f; --ai:#b9a8ec; --ai-soft:#2f2a40;
   --warn-soft:#3a2f22; color-scheme:dark}
+/* 버전2: 푸른 윤슬 강물 배경 (canvas#river에 직접 그려요) */
+:root{--river:#cfe7f6;--on-river:#33414d}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--river:#0e2438;--on-river:#dbe7f2}}
+:root[data-theme="dark"]{--river:#0e2438;--on-river:#dbe7f2}
+#river{position:fixed;inset:0;width:100%;height:100%;z-index:-1;display:block;pointer-events:none}
+main > section > .chips .lbl, main > section > .result > .mood, .pick-l, main .privacy{color:var(--on-river)}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65;
+body{background:var(--river);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px 56px}
 main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
 /* 버전2: 오른쪽 위 도구줄(언어 + BGM) */
@@ -136,6 +142,7 @@ form button:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
+<canvas id="river" aria-hidden="true"></canvas>
 
 <main>
   <div class="topbar">
@@ -883,5 +890,106 @@ JSON 하나만 답한다:
   }
 })();
 
+</script>
+<script>
+// 버전2: 푸른 윤슬 강물 배경 — 사진 없이 코드로 직접 그려서 저작권 걱정이 없어요.
+// 물빛 그라데이션 + 천천히 흐르는 물결 + 햇빛이 부서지는 반짝임(윤슬).
+// 움직임 줄이기 설정이면 멈춘 한 장면만 그리고, 탭이 안 보일 때는 쉬어요.
+(() => {
+  "use strict";
+  const c = document.getElementById("river");
+  if (!c || !c.getContext) return;
+  const ctx = c.getContext("2d");
+  const root = document.documentElement;
+  const darkQ = matchMedia("(prefers-color-scheme: dark)");
+  const calmQ = matchMedia("(prefers-reduced-motion: reduce)");
+  const isDark = () => root.dataset.theme === "dark" || (root.dataset.theme !== "light" && darkQ.matches);
+  let W = 0, H = 0, glints = [], raf = 0, last = 0;
+
+  function seed() {
+    const n = Math.min(320, Math.round((W * H) / 5000));
+    glints = Array.from({ length: n }, () => ({
+      x: Math.random() * W,
+      y: Math.pow(Math.random(), 0.8) * H,
+      len: 3 + Math.random() * 14,
+      ph: Math.random() * Math.PI * 2,
+      sp: 0.5 + Math.random() * 1.5,
+      drift: 4 + Math.random() * 12
+    }));
+  }
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    seed();
+  }
+  function draw(t) {
+    const d = isDark();
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    if (d) { g.addColorStop(0, "#0a1b2c"); g.addColorStop(0.5, "#11314d"); g.addColorStop(1, "#1a4567"); }
+    else { g.addColorStop(0, "#e6f4fc"); g.addColorStop(0.45, "#c2e3f5"); g.addColorStop(1, "#93c8e8"); }
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // 천천히 흐르는 물결 띠
+    ctx.lineCap = "round";
+    for (let k = 0; k < 7; k++) {
+      const y0 = H * (0.08 + k * 0.14);
+      const amp = 4 + k * 1.2, wl = 180 + k * 40, ph = t * 0.00025 * (1 + k * 0.15) + k;
+      ctx.beginPath();
+      for (let x = -20; x <= W + 20; x += 12) {
+        const y = y0 + Math.sin(x / wl * Math.PI * 2 + ph) * amp + Math.sin(x / (wl * 0.37) - ph * 1.7) * amp * 0.35;
+        x === -20 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = d ? "rgba(140,190,235,0.07)" : "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 10 + k * 2;
+      ctx.stroke();
+    }
+
+    // 윤슬: 반짝였다 사라지는 가로로 긴 빛 조각
+    ctx.globalCompositeOperation = "lighter";
+    for (const s of glints) {
+      const b = Math.pow(Math.max(0, Math.sin(t * 0.0012 * s.sp + s.ph)), 6);
+      if (b < 0.02) continue;
+      const x = (s.x + (t / 1000) * s.drift) % (W + 40) - 20;
+      const y = s.y + Math.sin(t * 0.0008 + s.ph) * 2;
+      const r = s.len * (0.6 + b * 0.6);
+      const a = (d ? 0.75 : 0.9) * b;
+      const rg = ctx.createRadialGradient(x, y, 0, x, y, r);
+      rg.addColorStop(0, `rgba(255,255,255,${a})`);
+      rg.addColorStop(0.35, d ? `rgba(190,225,255,${a * 0.5})` : `rgba(235,248,255,${a * 0.55})`);
+      rg.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = rg;
+      ctx.beginPath();
+      ctx.ellipse(x, y, r, r * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+      if (b > 0.85) { // 가장 밝은 순간엔 작은 별빛
+        ctx.fillStyle = `rgba(255,255,255,${(b - 0.85) * 4})`;
+        ctx.fillRect(x - 0.5, y - r * 0.5, 1, r);
+        ctx.fillRect(x - r * 0.5, y - 0.5, r, 1);
+      }
+    }
+    ctx.globalCompositeOperation = "source-over";
+  }
+  function loop(t) {
+    raf = requestAnimationFrame(loop);
+    if (t - last < 33) return; // 약 30fps
+    last = t;
+    draw(t);
+  }
+  function start() {
+    cancelAnimationFrame(raf);
+    if (calmQ.matches) { draw(4000); return; }
+    if (!document.hidden) raf = requestAnimationFrame(loop);
+  }
+  addEventListener("resize", () => { resize(); if (calmQ.matches) draw(4000); });
+  document.addEventListener("visibilitychange", start);
+  calmQ.addEventListener("change", start);
+  darkQ.addEventListener("change", () => draw(performance.now()));
+  resize();
+  start();
+})();
 </script>
 </body></html>
