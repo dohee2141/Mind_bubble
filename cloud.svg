@@ -1,39 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150">
-  <!-- 마음버블서점 구름 로고: 직접 그린 그림이라 저작권 걱정이 없어요 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180">
+  <!-- 마음버블서점 구름: 직접 그린 그림이라 저작권 걱정이 없어요.
+       노이즈로 가장자리를 몽실몽실하게 흩뜨리고, 아래는 푸른 그늘·위는 햇빛을 겹쳐 사실적으로 보이게 해요. -->
   <defs>
-    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
-      <feGaussianBlur stdDeviation="3.2"/>
+    <filter id="cl-fluff" x="-20%" y="-30%" width="140%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency=".032" numOctaves="4" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="22" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="2.6"/>
     </filter>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="7"/>
+    <filter id="cl-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="11" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="6"/>
     </filter>
-    <radialGradient id="puff" cx="45%" cy="28%" r="85%">
+    <radialGradient id="cl-body" cx="48%" cy="22%" r="80%">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset=".55" stop-color="#f4f6fa"/>
-      <stop offset="1" stop-color="#d5dbe6"/>
+      <stop offset=".5" stop-color="#f6f8fb"/>
+      <stop offset="1" stop-color="#dfe6ef"/>
     </radialGradient>
-    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f3f5f9"/>
-      <stop offset="1" stop-color="#cfd6e2"/>
+    <linearGradient id="cl-belly" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9eef5" stop-opacity="0"/>
+      <stop offset="1" stop-color="#b7c6d8" stop-opacity=".85"/>
     </linearGradient>
   </defs>
-  <!-- 아래쪽 은은한 그림자 -->
-  <ellipse cx="100" cy="122" rx="66" ry="9" fill="#9fb3c9" opacity=".25" filter="url(#glow)"/>
-  <!-- 몽글몽글한 구름 덩어리 -->
-  <g filter="url(#soft)">
-    <ellipse cx="100" cy="102" rx="74" ry="22" fill="url(#base)"/>
-    <circle cx="48" cy="92" r="26" fill="url(#puff)"/>
-    <circle cx="76" cy="72" r="32" fill="url(#puff)"/>
-    <circle cx="116" cy="58" r="36" fill="url(#puff)"/>
-    <circle cx="150" cy="78" r="30" fill="url(#puff)"/>
-    <circle cx="166" cy="98" r="20" fill="url(#puff)"/>
-    <circle cx="96" cy="96" r="30" fill="url(#puff)"/>
-    <circle cx="130" cy="98" r="26" fill="url(#puff)"/>
+
+  <!-- 몸통 -->
+  <g filter="url(#cl-fluff)" fill="url(#cl-body)">
+    <ellipse cx="150" cy="128" rx="118" ry="28"/>
+    <circle cx="62" cy="116" r="30"/>
+    <circle cx="96" cy="92" r="40"/>
+    <circle cx="142" cy="70" r="50"/>
+    <circle cx="192" cy="84" r="42"/>
+    <circle cx="232" cy="108" r="32"/>
+    <circle cx="120" cy="118" r="36"/>
+    <circle cx="176" cy="120" r="34"/>
+    <circle cx="258" cy="128" r="20"/>
+    <circle cx="40" cy="132" r="18"/>
   </g>
-  <!-- 햇빛 받은 윗부분 하이라이트 -->
-  <g fill="#ffffff" filter="url(#glow)" opacity=".9">
-    <circle cx="70" cy="64" r="14"/>
-    <circle cx="110" cy="48" r="17"/>
-    <circle cx="146" cy="70" r="12"/>
+
+  <!-- 아래쪽 푸른 그늘 -->
+  <g filter="url(#cl-soft)" fill="url(#cl-belly)">
+    <ellipse cx="150" cy="134" rx="112" ry="22"/>
+  </g>
+
+  <!-- 햇빛 받은 윗부분 -->
+  <g filter="url(#cl-soft)" fill="#ffffff" opacity=".95">
+    <circle cx="94" cy="80" r="20"/>
+    <circle cx="140" cy="56" r="26"/>
+    <circle cx="188" cy="72" r="18"/>
+    <circle cx="228" cy="100" r="12"/>
   </g>
 </svg>
