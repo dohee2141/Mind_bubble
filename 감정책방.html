@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://mind-bubble-rest.github.io/og-image.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>/* 저장해 둔 밝은/다크 모드를 화면이 그려지기 전에 적용해서 깜빡임을 막아요 */try{var mbT=localStorage.getItem("mb-theme");if(mbT==="light"||mbT==="dark")document.documentElement.dataset.theme=mbT}catch(e){}</script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 /* Layout: one calm column — bubble header, two soft tabs, one input card, latest result only */
 :root{
@@ -152,6 +152,17 @@ form button:disabled{opacity:.5;cursor:default}
 .fb .msg{font-size:.86rem;color:var(--muted);margin:0}
 .privacy{margin:0;text-align:center;font-size:.78rem;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.result>*{animation:rise .3s ease both}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
+/* 버전2: 편지처럼 말을 거는 문장만 손글씨(Nanum Pen Script)로.
+   버튼·입력칸·작은 안내·책 제목은 읽기 쉽게 기존 글꼴 그대로. 손글씨는 작게 보여서 크기를 키웠어요. */
+:root{--pen:"Nanum Pen Script","Gowun Dodum","Noto Sans KR",cursive}
+.header-area h1{font-family:var(--pen);font-weight:400;font-size:3.6rem;letter-spacing:.04em;line-height:1.1}
+.header-area p.subtitle{font-family:var(--pen);font-weight:400;font-size:1.9rem;letter-spacing:.02em;line-height:1.3}
+.header-area p.desc{font-family:var(--pen);font-size:1.55rem;letter-spacing:.02em;line-height:1.4}
+.pick-l,form label,.fb h2{font-family:var(--pen);font-weight:400;font-size:1.55rem;line-height:1.3}
+.mood{font-family:var(--pen);font-size:1.75rem;line-height:1.35}
+.read,.thinking{font-family:var(--pen);font-size:1.45rem;line-height:1.45}
+.books .w{font-family:var(--pen);font-size:1.32rem;line-height:1.45;margin-top:6px}
+@media (max-width:520px){.header-area h1{font-size:3rem}.header-area p.subtitle{font-size:1.65rem}}
 </style>
 </head>
 <body>
