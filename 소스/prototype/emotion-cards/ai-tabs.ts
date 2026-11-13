@@ -91,11 +91,21 @@ const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySele
 const esc = (s: unknown) =>
   String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!)
 
+// 표지 이미지를 못 불러오면 원래 이모지로 바꿔요
+document.addEventListener("error", (e) => {
+  const img = e.target as HTMLElement;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains("cover")) return;
+  const span = document.createElement("span");
+  span.className = "em";
+  span.setAttribute("aria-hidden", "true");
+  span.textContent = img.dataset.em ?? "";
+  img.replaceWith(span);
+}, true);
 const cardsHTML = (items: { book: Book; why: string }[]) =>
   '<ol class="books">' +
   items
     .map(
-      ({ book, why }) => `<li><span class="em" aria-hidden="true">${book.emoji}</span>
+      ({ book, why }) => `<li><img class="cover" src="covers/${book.id}.jpg" alt="${esc(book.title)} 표지" width="64" height="94" loading="lazy" data-em="${book.emoji}">
       <div class="bk"><div class="t">『${esc(book.title)}』</div><div class="a">${esc(book.author)}</div>
       <div class="w">${esc(why)}</div></div></li>`,
     )

@@ -67,6 +67,7 @@ form button:disabled{opacity:.5;cursor:default}
 .books li{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
 .books .em{font-size:1.6rem;line-height:1.3;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--accent-soft);flex-shrink:0}
 #p-ai .books .em{background:var(--ai-soft)}
+.books .cover{width:64px;height:auto;flex-shrink:0;border-radius:4px;background:var(--line);box-shadow:0 1px 4px rgba(0,0,0,.18)}
 .books .bk{min-width:0}
 .books .t{font-weight:700}
 .books .a{color:var(--muted);font-size:.85rem}
@@ -132,7 +133,7 @@ form button:disabled{opacity:.5;cursor:default}
     { id: "you-are-right", title: "당신이 옳다", author: "정혜신", category: "people", mood: "누군가에게 온전히 이해받고 싶을 때", note: "충고보다 공감이 사람을 살린다는 이야기. 나와 주변을 대하는 법이 달라져요.", keywords: ["서운함", "공감", "이해", "상처", "외로움", "위로"], emoji: "🤝" },
     { id: "almond", title: "아몬드", author: "손원평", category: "people", mood: "마음을 표현하는 게 서툴러 외로울 때", note: "감정을 잘 느끼지 못하는 소년이 사람을 통해 변해가는 따뜻한 소설이에요.", keywords: ["외로움", "고립", "표현", "서툼", "공허"], emoji: "🌰" },
     { id: "reading-relationships", title: "관계를 읽는 시간", author: "문요한", category: "people", mood: "가까운 사람 때문에 자꾸 지치고 상처받을 때", note: '나와 너 사이의 적당한 거리, "바운더리"를 세우는 법을 차분하게 알려줘요.', keywords: ["갈등", "상처", "배신", "거리두기", "서운함", "지침", "가족"], emoji: "🪢" },
-    { id: "need-to-be-lonely", title: "가끔은 격하게 외로울 필요가 있다", author: "김정운", category: "people", mood: "사람들 속에 있어도 혼자인 것 같을 때", note: "외로움을 피할 대상이 아니라 나를 만나는 시간으로 바꿔 보자는 유쾌한 제안이에요.", keywords: ["외로움", "혼자", "쓸쓸함", "고독", "소외감"], emoji: "🏝️" },
+    { id: "need-to-be-lonely", title: "가끔은 격하게 외로워야 한다", author: "김정운", category: "people", mood: "사람들 속에 있어도 혼자인 것 같을 때", note: "외로움을 피할 대상이 아니라 나를 만나는 시간으로 바꿔 보자는 유쾌한 제안이에요.", keywords: ["외로움", "혼자", "쓸쓸함", "고독", "소외감"], emoji: "🏝️" },
     // ❤️ 사랑
     { id: "essays-in-love", title: "왜 나는 너를 사랑하는가", author: "알랭 드 보통", category: "love", mood: "사랑의 시작과 흔들림, 이별까지 마음이 복잡할 때", note: "사랑에 빠지고 아파하는 우리의 마음을 가장 섬세하고 지적인 언어로 어루만져 줘요.", keywords: ["설렘", "혼란", "이별", "집착", "연애"], emoji: "❤️" },
     { id: "art-of-loving", title: "사랑의 기술", author: "에리히 프롬", category: "love", mood: "나를 잃지 않으면서 건강하게 사랑하고 싶을 때", note: "사랑은 감정에만 머무는 게 아니라 나를 먼저 돌보는 단단한 힘에서 시작된다고 말해줘요.", keywords: ["집착", "불안", "의존", "연애", "자존감"], emoji: "💌" },
@@ -390,8 +391,18 @@ form button:disabled{opacity:.5;cursor:default}
   var emo = (name) => lang === "en" ? EMO_EN[name] ?? name : name;
   var $ = (s) => document.querySelector(s);
   var esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+// 표지 이미지를 못 불러오면 원래 이모지로 바꿔요
+  document.addEventListener("error", (e) => {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || !img.classList.contains("cover")) return;
+    const span = document.createElement("span");
+    span.className = "em";
+    span.setAttribute("aria-hidden", "true");
+    span.textContent = img.dataset.em ?? "";
+    img.replaceWith(span);
+  }, true);
   var cardsHTML = (items) => '<ol class="books">' + items.map(
-    ({ book, why }) => `<li><span class="em" aria-hidden="true">${book.emoji}</span>
+    ({ book, why }) => `<li><img class="cover" src="covers/${book.id}.jpg" alt="${esc(book.title)} 표지" width="64" height="94" loading="lazy" data-em="${book.emoji}">
       <div class="bk"><div class="t">『${esc(book.title)}』</div><div class="a">${esc(book.author)}</div>
       <div class="w">${esc(why)}</div></div></li>`
   ).join("") + "</ol>";

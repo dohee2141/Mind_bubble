@@ -30,7 +30,7 @@ export const BOOKS: Book[] = [
   { id: 'you-are-right', title: '당신이 옳다', author: '정혜신', category: 'people', mood: '누군가에게 온전히 이해받고 싶을 때', note: '충고보다 공감이 사람을 살린다는 이야기. 나와 주변을 대하는 법이 달라져요.', keywords: ['서운함', '공감', '이해', '상처', '외로움', '위로'], emoji: '🤝' },
   { id: 'almond', title: '아몬드', author: '손원평', category: 'people', mood: '마음을 표현하는 게 서툴러 외로울 때', note: '감정을 잘 느끼지 못하는 소년이 사람을 통해 변해가는 따뜻한 소설이에요.', keywords: ['외로움', '고립', '표현', '서툼', '공허'], emoji: '🌰' },
   { id: 'reading-relationships', title: '관계를 읽는 시간', author: '문요한', category: 'people', mood: '가까운 사람 때문에 자꾸 지치고 상처받을 때', note: '나와 너 사이의 적당한 거리, "바운더리"를 세우는 법을 차분하게 알려줘요.', keywords: ['갈등', '상처', '배신', '거리두기', '서운함', '지침', '가족'], emoji: '🪢' },
-  { id: 'need-to-be-lonely', title: '가끔은 격하게 외로울 필요가 있다', author: '김정운', category: 'people', mood: '사람들 속에 있어도 혼자인 것 같을 때', note: '외로움을 피할 대상이 아니라 나를 만나는 시간으로 바꿔 보자는 유쾌한 제안이에요.', keywords: ['외로움', '혼자', '쓸쓸함', '고독', '소외감'], emoji: '🏝️' },
+  { id: 'need-to-be-lonely', title: '가끔은 격하게 외로워야 한다', author: '김정운', category: 'people', mood: '사람들 속에 있어도 혼자인 것 같을 때', note: '외로움을 피할 대상이 아니라 나를 만나는 시간으로 바꿔 보자는 유쾌한 제안이에요.', keywords: ['외로움', '혼자', '쓸쓸함', '고독', '소외감'], emoji: '🏝️' },
 
   // ❤️ 사랑
   { id: 'essays-in-love', title: '왜 나는 너를 사랑하는가', author: '알랭 드 보통', category: 'love', mood: '사랑의 시작과 흔들림, 이별까지 마음이 복잡할 때', note: '사랑에 빠지고 아파하는 우리의 마음을 가장 섬세하고 지적인 언어로 어루만져 줘요.', keywords: ['설렘', '혼란', '이별', '집착', '연애'], emoji: '❤️' },
