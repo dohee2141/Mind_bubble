@@ -1,0 +1,118 @@
+<title>감정책방</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: one calm column — bubble header, two soft tabs, one input card, latest result only */
+:root{
+  --bg:#fdf8f5; --surface:#ffffff; --ink:#3a302d; --muted:#8a7d78; --line:#f0e4de;
+  --accent:#d9718f; --accent-ink:#ffffff; --accent-soft:#fbe6ec; --ai:#8c78c9; --ai-soft:#efeafa;
+  --warn-soft:#fdf1e3;
+  --display:"Gowun Dodum","Noto Sans KR",system-ui,sans-serif;
+  --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1e1a1a; --surface:#292323; --ink:#f2e9e6; --muted:#b4a6a1; --line:#3b3231;
+  --accent:#ee9ab2; --accent-ink:#2a1a1f; --accent-soft:#45282f; --ai:#b9a8ec; --ai-soft:#2f2a40;
+  --warn-soft:#3a2f22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1e1a1a; --surface:#292323; --ink:#f2e9e6; --muted:#b4a6a1; --line:#3b3231;
+  --accent:#ee9ab2; --accent-ink:#2a1a1f; --accent-soft:#45282f; --ai:#b9a8ec; --ai-soft:#2f2a40;
+  --warn-soft:#3a2f22; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px 56px}
+main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.lang{align-self:flex-end;display:flex;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:-8px}
+.lang button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:.8rem;padding:3px 12px;border-radius:999px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent);font-weight:500}
+header{text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center}
+.bubble{font-size:2.2rem;line-height:1}
+h1{font-family:var(--display);font-size:1.7rem;font-weight:400;margin:0}
+header p{margin:0;color:var(--muted)}
+
+[role=tablist]{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px}
+[role=tab]{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:500;padding:8px 10px;border-radius:999px;cursor:pointer}
+[role=tab][aria-selected=true]#t-rule{background:var(--accent-soft);color:var(--accent)}
+[role=tab][aria-selected=true]#t-ai{background:var(--ai-soft);color:var(--ai)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[role=tabpanel]{display:flex;flex-direction:column;gap:14px}
+
+form{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+form label{font-family:var(--display);font-size:1.05rem}
+textarea{width:100%;min-height:76px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;padding:10px 12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.count{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+form button{border:0;border-radius:999px;padding:9px 20px;font:inherit;font-weight:500;cursor:pointer;color:var(--accent-ink);background:var(--accent)}
+#p-ai form button{background:var(--ai)}
+form button:disabled{opacity:.5;cursor:default}
+.hint{margin:0;font-size:.82rem;color:var(--muted)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips .lbl{font-size:.82rem;color:var(--muted);margin-right:2px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.86rem;padding:4px 12px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+
+.result{display:flex;flex-direction:column;gap:12px}
+.result:empty{display:none}
+.mood{font-family:var(--display);font-size:1.1rem;margin:0}
+.mood b{font-weight:400;color:var(--accent)}
+#p-ai .mood b{color:var(--ai)}
+.read{margin:0;background:var(--ai-soft);border-radius:12px;padding:10px 14px}
+.soft{margin:0;background:var(--warn-soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.soft p{margin:0}
+.thinking{margin:0;color:var(--ai);font-family:var(--display);font-size:1.05rem}
+.books{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.books li{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.books .em{font-size:1.6rem;line-height:1.3;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--accent-soft);flex-shrink:0}
+#p-ai .books .em{background:var(--ai-soft)}
+.books .bk{min-width:0}
+.books .t{font-weight:700}
+.books .a{color:var(--muted);font-size:.85rem}
+.books .w{margin-top:4px;font-size:.93rem}
+@media (prefers-reduced-motion:no-preference){.result>*{animation:rise .3s ease both}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
+</style>
+
+<main>
+  <div class="lang" role="group" aria-label="언어 / Language">
+    <button type="button" data-lang="ko" aria-pressed="true">한국어</button>
+    <button type="button" data-lang="en" aria-pressed="false">English</button>
+  </div>
+
+  <header>
+    <span class="bubble" aria-hidden="true">📚</span>
+    <h1 data-i18n="title">감정책방</h1>
+    <p data-i18n="sub">오늘 마음에 맞는 책 세 권을 골라 드려요</p>
+  </header>
+
+  <nav role="tablist" aria-label="찾는 방식">
+    <button role="tab" id="t-rule" aria-controls="p-rule" aria-selected="true" data-i18n="tabRule">마음 단어로 찾기</button>
+    <button role="tab" id="t-ai" aria-controls="p-ai" aria-selected="false" tabindex="-1" data-i18n="tabAi">AI에게 물어보기</button>
+  </nav>
+
+  <section role="tabpanel" id="p-rule" aria-labelledby="t-rule">
+    <form id="f-rule">
+      <label for="q-rule" data-i18n="ask">오늘 마음을 한 문장으로 적어 주세요</label>
+      <textarea id="q-rule" maxlength="300" placeholder="예: 발표 앞두고 불안해" data-i18n-ph="phRule"></textarea>
+      <div class="row"><span class="count" id="c-rule">0/300</span><button type="submit" data-i18n="submit">책 추천받기</button></div>
+      <p class="hint" data-i18n="hintRule" hidden></p>
+    </form>
+    <div class="chips" id="chips-rule"></div>
+    <div class="result" id="out-rule" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="p-ai" aria-labelledby="t-ai" hidden>
+    <form id="f-ai">
+      <label for="q-ai" data-i18n="ask">오늘 마음을 한 문장으로 적어 주세요</label>
+      <textarea id="q-ai" maxlength="300" placeholder="예: 불안한 건 아닌데 마음이 허해" data-i18n-ph="phAi"></textarea>
+      <div class="row"><span class="count" id="c-ai">0/300</span><button type="submit" id="b-ai" data-i18n="submit">책 추천받기</button></div>
+      <p class="hint" data-i18n="hintAi">감정 단어가 없어도 괜찮아요. 처음 한 번은 Claude 사용 허용 창이 떠요.</p>
+    </form>
+    <div class="chips" id="chips-ai"></div>
+    <div class="result" id="out-ai" aria-live="polite"></div>
+  </section>
+</main>
+
+<script>
+/*__APP__*/
+</script>

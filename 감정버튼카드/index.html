@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>감정책방</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fdf8f3;
+      --surface: #ffffff;
+      --text: #3d3530;
+      --muted: #8a7f78;
+      --line: #eee3da;
+      --pick: #fbe3ea;
+      --pick-line: #e98aa5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1f1b1a;
+        --surface: #2a2523;
+        --text: #f1e9e4;
+        --muted: #b3a79f;
+        --line: #3b3431;
+        --pick: #4a2f37;
+        --pick-line: #e98aa5;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Gowun Dodum', system-ui, sans-serif;
+      line-height: 1.6;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+    header { text-align: center; margin-bottom: 28px; }
+    header h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    header p { margin: 0; color: var(--muted); }
+
+    #emotions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    #emotions button {
+      font: inherit;
+      color: inherit;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: transform .12s, border-color .12s, background .12s;
+    }
+    #emotions button:hover { transform: translateY(-2px); border-color: var(--pick-line); }
+    #emotions button:focus-visible { outline: 3px solid var(--pick-line); outline-offset: 2px; }
+    #emotions button[aria-pressed="true"] { background: var(--pick); border-color: var(--pick-line); }
+    #emotions .emoji { font-size: 1.6rem; }
+
+    #result { margin-top: 36px; scroll-margin-top: 16px; }
+    #result-heading { font-size: 1.15rem; text-align: center; margin: 0 0 16px; }
+    #cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: rise .35s ease both;
+    }
+    .cover {
+      background: var(--accent);
+      height: 96px;
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+    }
+    .body { padding: 14px 16px 18px; }
+    .body h3 { margin: 0; font-size: 1.05rem; }
+    .author { margin: 2px 0 10px; color: var(--muted); font-size: .9rem; }
+    .note { margin: 0; font-size: .95rem; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+
+    @media (max-width: 600px) {
+      #cards { grid-template-columns: 1fr; }
+      .card { flex-direction: row; }
+      .cover { width: 84px; height: auto; flex-shrink: 0; font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>📚 감정책방</h1>
+      <p>지금 마음에 가장 가까운 걸 하나 골라 주세요</p>
+    </header>
+    <div id="emotions" role="group" aria-label="감정 고르기"></div>
+    <section id="result" hidden aria-live="polite">
+      <h2 id="result-heading"></h2>
+      <div id="cards"></div>
+    </section>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
