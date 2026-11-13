@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>감정책방</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>마음버블서점</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
@@ -37,6 +37,7 @@ header p{margin:0;color:var(--muted)}
 [role=tab][aria-selected=true]#t-ai{background:var(--ai-soft);color:var(--ai)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [role=tabpanel]{display:flex;flex-direction:column;gap:14px}
+[role=tabpanel][hidden]{display:none}
 
 form{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
 form label{font-family:var(--display);font-size:1.05rem}
@@ -80,8 +81,8 @@ form button:disabled{opacity:.5;cursor:default}
   </div>
 
   <header>
-    <span class="bubble" aria-hidden="true">📚</span>
-    <h1 data-i18n="title">감정책방</h1>
+    <span class="bubble" aria-hidden="true">🫧</span>
+    <h1 data-i18n="title">마음버블서점</h1>
     <p data-i18n="sub">오늘 마음에 맞는 책 세 권을 골라 드려요</p>
   </header>
 
@@ -294,7 +295,7 @@ form button:disabled{opacity:.5;cursor:default}
   // prototype/emotion-cards/ai-tabs.ts
   var I18N = {
     ko: {
-      title: "감정책방",
+      title: "마음버블서점",
       sub: "오늘 마음에 맞는 책 세 권을 골라 드려요",
       tabRule: "마음 단어로 찾기",
       tabAi: "AI에게 물어보기",
@@ -322,7 +323,7 @@ form button:disabled{opacity:.5;cursor:default}
       err_other: "연결이 잠시 끊겼어요. 다시 눌러 주세요."
     },
     en: {
-      title: "Emotion Bookshop",
+      title: "Maeum Bubble Books",
       sub: "Three books picked for how you feel today",
       tabRule: "Find by feeling words",
       tabAi: "Ask AI",

@@ -9,7 +9,7 @@ type Lang = 'ko' | 'en'
 
 const I18N = {
   ko: {
-    title: '감정책방',
+    title: '마음버블서점',
     sub: '오늘 마음에 맞는 책 세 권을 골라 드려요',
     tabRule: '마음 단어로 찾기',
     tabAi: 'AI에게 물어보기',
@@ -37,7 +37,7 @@ const I18N = {
     err_other: '연결이 잠시 끊겼어요. 다시 눌러 주세요.',
   },
   en: {
-    title: 'Emotion Bookshop',
+    title: 'Maeum Bubble Books',
     sub: 'Three books picked for how you feel today',
     tabRule: 'Find by feeling words',
     tabAi: 'Ask AI',
