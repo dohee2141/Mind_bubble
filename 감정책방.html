@@ -80,6 +80,19 @@ form button:disabled{opacity:.5;cursor:default}
 .books .t{font-weight:700}
 .books .a{color:var(--muted);font-size:.85rem}
 .books .w{margin-top:4px;font-size:.93rem}
+.fb{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.fb h2{font-family:var(--display);font-size:1.05rem;font-weight:400;margin:0}
+.fb .stars{display:flex;gap:2px;border:0;margin:0;padding:0}
+.fb .stars legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fb .stars label{cursor:pointer;font-size:1.5rem;line-height:1;color:var(--line);padding:2px}
+.fb .stars input{position:absolute;opacity:0;width:1px;height:1px}
+.fb .stars label.on{color:var(--accent)}
+.fb .stars input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.fb textarea{min-height:60px}
+.fb button{border:0;border-radius:999px;padding:8px 18px;font:inherit;font-weight:500;cursor:pointer;color:var(--accent-ink);background:var(--accent)}
+.fb button:disabled{opacity:.5;cursor:default}
+.fb .msg{font-size:.86rem;color:var(--muted);margin:0}
+.privacy{margin:0;text-align:center;font-size:.78rem;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.result>*{animation:rise .3s ease both}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
 </style>
 
@@ -125,8 +138,20 @@ form button:disabled{opacity:.5;cursor:default}
     <div class="chips" id="chips-ai"></div>
     <div class="result" id="out-ai" aria-live="polite"></div>
   </section>
+
+  <form class="fb" id="fb" hidden>
+    <h2 data-i18n="fbTitle">추천이 마음에 닿았나요?</h2>
+    <fieldset class="stars" id="fb-stars">
+      <legend data-i18n="fbRating">별점</legend>
+    </fieldset>
+    <textarea id="fb-msg" maxlength="1000" data-i18n-ph="fbPh" placeholder="하고 싶은 말을 남겨 주세요 (선택)"></textarea>
+    <div class="row"><p class="msg" id="fb-out" aria-live="polite"></p><button type="submit" data-i18n="fbSend">보내기</button></div>
+  </form>
+  <p class="privacy" id="privacy" data-i18n="privacy" hidden>적어 주신 문장과 피드백은 서비스를 다듬기 위해 이름 없이 저장돼요.</p>
 </main>
 
+<script src="mb-config.js"></script>
+<script src="mb-cloud.js"></script>
 <script>
 "use strict";
 (() => {
@@ -334,7 +359,18 @@ form button:disabled{opacity:.5;cursor:default}
       err_session_expired: "로그인이 만료됐어요. 다시 로그인한 뒤 눌러 주세요.",
       err_invalid_json: "답을 제대로 받지 못했어요. 한 번 더 눌러 주세요.",
       err_refused: "이 문장에는 답하기 어려워요. 표현을 바꿔 다시 적어 주세요.",
-      err_other: "연결이 잠시 끊겼어요. 다시 눌러 주세요."
+      err_other: "연결이 잠시 끊겼어요. 다시 눌러 주세요.",
+      err_ai_disabled: '지금은 AI에게 물어볼 수 없어요. "마음 단어로 찾기"를 써 주세요.',
+      err_daily_limit: "오늘 AI 추천이 모두 소진됐어요. 내일 다시 와 주세요.",
+      hintAiCloud: "감정 단어가 없어도 괜찮아요. AI가 문장 전체를 읽고 골라 드려요.",
+      fbTitle: "추천이 마음에 닿았나요?",
+      fbRating: "별점",
+      fbPh: "하고 싶은 말을 남겨 주세요 (선택)",
+      fbSend: "보내기",
+      fbThanks: "고마워요. 잘 받았어요.",
+      fbFail: "보내지 못했어요. 잠시 뒤 다시 눌러 주세요.",
+      fbEmpty: "별점이나 한마디를 남겨 주세요.",
+      privacy: "적어 주신 문장과 피드백은 서비스를 다듬기 위해 이름 없이 저장돼요."
     },
     en: {
       title: "Maeum Bubble Books",
@@ -363,7 +399,18 @@ form button:disabled{opacity:.5;cursor:default}
       err_session_expired: "Your sign-in expired. Sign in again and try once more.",
       err_invalid_json: "We didn't get a proper answer. Please try again.",
       err_refused: "We can't answer that sentence. Try putting it differently.",
-      err_other: "The connection dropped. Please try again."
+      err_other: "The connection dropped. Please try again.",
+      err_ai_disabled: 'AI isn\'t available right now. Please use "Find by feeling words".',
+      err_daily_limit: "Today's AI picks are used up. Please come back tomorrow.",
+      hintAiCloud: "No feeling words needed. AI reads your whole sentence.",
+      fbTitle: "Did these picks feel right?",
+      fbRating: "Rating",
+      fbPh: "Anything you'd like to tell us? (optional)",
+      fbSend: "Send",
+      fbThanks: "Thank you. We got it.",
+      fbFail: "Couldn't send. Please try again in a moment.",
+      fbEmpty: "Leave a rating or a few words.",
+      privacy: "Sentences and feedback you send are stored without your name to improve the service."
     }
   };
   var EMO_EN = {
@@ -430,29 +477,38 @@ form button:disabled{opacity:.5;cursor:default}
     img.replaceWith(span);
   }, true);
   var cardsHTML = (items) => '<ol class="books">' + items.map(
-    ({ book, why }) => `<li><img class="cover" src="covers/${book.id}.jpg" alt="${esc(book.title)} 표지" width="64" height="94" loading="lazy" data-em="${book.emoji}">
+    ({ book, why }) => `<li><img class="cover" src="${esc(book.cover_url || `covers/${book.id}.jpg`)}" alt="${esc(book.title)} 표지" width="64" height="94" loading="lazy" data-em="${book.emoji}">
       <div class="bk"><div class="t">『${esc(book.title)}』</div><div class="a">${esc(book.author)}</div>
       <div class="w">${esc(why)}</div></div></li>`
   ).join("") + "</ol>";
   var chipsHTML = (items) => items.map((c) => `<button type="button" class="chip" data-q="${esc(c.q)}">${esc(c.label)}</button>`).join("");
   var moodHTML = (names) => `<p class="mood">${esc(t("moodPre"))}<b>${names}</b>${esc(t("moodPost"))}</p>`;
-  var defaults = () => DEFAULT_BOOK_IDS.map((id) => BOOKS.find((b) => b.id === id));
+  var defaults = () => {
+    const picked = DEFAULT_BOOK_IDS.map((id) => BOOKS.find((b) => b.id === id)).filter(Boolean);
+    for (const b of BOOKS) if (picked.length < 3 && !picked.includes(b)) picked.push(b);
+    return picked;
+  };
+  var cloud = window.MB_CLOUD || { enabled: false, visit() {}, search() {} };
+  var track = (mode, query, emotions, books) => cloud.search({ mode, query, emotions, books: books.map((b) => b.book.id), lang });
   var lastRule = "";
-  function ruleRespond(raw) {
+  function ruleRespond(raw, log = false) {
     const input = raw.trim();
     if (!input) return;
     lastRule = input;
     const found = findEmotions(input);
     const out = $("#out-rule");
+    let books;
     if (found.length) {
-      const books = recommendByKeyword(found.map((f) => f.keyword).join(" "), 3).recommendations.map((r) => ({
+      books = recommendByKeyword(found.map((f) => f.keyword).join(" "), 3).recommendations.map((r) => ({
         book: r.book,
         why: r.book.note
       }));
       out.innerHTML = moodHTML(found.map((f) => esc(emo(f.emotion))).join(", ")) + cardsHTML(books);
     } else {
-      out.innerHTML = `<div class="soft"><p>${esc(t("unknown"))}</p><div class="chips">${chipsHTML(NINE.map((n) => ({ label: emo(n), q: n })))}</div></div><p class="mood">${esc(t("howAbout"))}</p>` + cardsHTML(defaults().map((book) => ({ book, why: book.note })));
+      books = defaults().map((book) => ({ book, why: book.note }));
+      out.innerHTML = `<div class="soft"><p>${esc(t("unknown"))}</p><div class="chips">${chipsHTML(NINE.map((n) => ({ label: emo(n), q: n })))}</div></div><p class="mood">${esc(t("howAbout"))}</p>` + cardsHTML(books);
     }
+    if (log) track("rule", input, found.map((f) => f.emotion), books);
   }
   var samplePromise = null;
   function getSample() {
@@ -461,7 +517,7 @@ form button:disabled{opacity:.5;cursor:default}
     return samplePromise;
   }
   var aiOff = false;
-  var CATALOG = BOOKS.map(
+  var catalog = () => BOOKS.map(
     (b) => `${b.id} | 『${b.title}』 ${b.author} | 이런 마음일 때: ${b.mood} | 키워드: ${b.keywords.join(", ")}`
   ).join("\n");
   function buildPrompt(input) {
@@ -478,21 +534,21 @@ form button:disabled{opacity:.5;cursor:default}
 - 감정 표현이 전혀 없으면 emotion을 null, books를 빈 배열로 한다.
 
 책 목록:
-${CATALOG}
+${catalog()}
 
 JSON 하나만 답한다:
 {"emotion":"감정 또는 null","secondary":["감정"],"read":"한 문장","books":[{"id":"책 id","why":"이유"}]}
 
 사용자 문장: """${input.slice(0, 300)}"""`;
   }
-  var STOP_CODES = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"];
+  var STOP_CODES = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed", "ai_disabled", "daily_limit"];
   var errText = (code) => {
     const k = `err_${code}`;
     return k in I18N.ko ? t(k) : t("err_other");
   };
   var strList = (v, n) => (Array.isArray(v) ? v : []).filter((x) => typeof x === "string" && x.trim() !== "").slice(0, n);
   var goRuleHTML = () => `<div class="chips"><button type="button" class="chip" data-go="rule">${esc(t("goRule"))}</button></div>`;
-  async function aiRespond(raw) {
+  async function aiRespond(raw, log = false) {
     const input = raw.trim();
     if (!input || aiOff) return;
     const out = $("#out-ai");
@@ -500,18 +556,20 @@ JSON 하나만 답한다:
     out.innerHTML = `<p class="thinking">${esc(t("thinking"))}</p>`;
     btn.disabled = true;
     const sample = await getSample();
-    if (!sample) {
+    if (!sample && !cloud.enabled) {
       out.innerHTML = `<div class="soft"><p>${esc(t("noAi"))}</p>${goRuleHTML()}</div>`;
       btn.disabled = false;
       return;
     }
     try {
-      const res = await sample.json(buildPrompt(input), { modelTier: "quick" });
+      const res = sample ? await sample.json(buildPrompt(input), { modelTier: "quick" }) : await cloud.ai(input.slice(0, 300), lang);
       const emotion = typeof res?.emotion === "string" && res.emotion.trim() && res.emotion.trim() !== "null" ? res.emotion.trim().slice(0, 24) : null;
       const secondary = strList(res?.secondary, 2).filter((s) => s !== emotion);
       const read = typeof res?.read === "string" ? res.read : "";
       if (!emotion) {
-        out.innerHTML = `<div class="soft"><p>${esc(t("noEmotion"))}</p></div><p class="mood">${esc(t("howAbout"))}</p>` + cardsHTML(defaults().map((book) => ({ book, why: book.note })));
+        const books = defaults().map((book) => ({ book, why: book.note }));
+        out.innerHTML = `<div class="soft"><p>${esc(t("noEmotion"))}</p></div><p class="mood">${esc(t("howAbout"))}</p>` + cardsHTML(books);
+        if (log) track("ai", input, [], books);
       } else {
         const picked = [];
         for (const b of Array.isArray(res?.books) ? res.books : []) {
@@ -524,6 +582,7 @@ JSON 하나만 답한다:
           if (picked.length < 3 && !picked.some((p) => p.book.id === r.book.id)) picked.push({ book: r.book, why: r.book.note });
         }
         out.innerHTML = moodHTML(esc(emotion) + (secondary.length ? ", " + secondary.map(esc).join(", ") : "")) + (read ? `<p class="read">${esc(read)}</p>` : "") + cardsHTML(picked);
+        if (log) track("ai", input, [emotion, ...secondary], picked);
       }
     } catch (e) {
       const code = e?.code ?? "";
@@ -556,6 +615,8 @@ JSON 하나만 답한다:
     ).join("");
     $("#chips-rule").innerHTML =`<span class="lbl">${esc(t("tryThis"))}</span>` + chipsHTML(EXAMPLES_KO.map((q) => ({ label: q, q })));
     $("#chips-ai").innerHTML = `<span class="lbl">${esc(t("tryThis"))}</span>` + chipsHTML((lang === "en" ? EXAMPLES_EN : EXAMPLES_KO).map((q) => ({ label: q, q })));
+    if (cloud.enabled && !window.claude) $('#p-ai .hint').textContent = t("hintAiCloud");
+    renderStars();
     if (lastRule) ruleRespond(lastRule);
     $("#out-ai").innerHTML = "";
   }
@@ -584,15 +645,15 @@ JSON 하나만 답한다:
     $(form).addEventListener("submit", (e) => {
       e.preventDefault();
       if (fn === aiRespond && $("#b-ai").disabled) return;
-      fn(ta.value);
+      fn(ta.value, true);
     });
   }
-  function fillAndRun(panel, text) {
+  function fillAndRun(panel, text, log = false) {
     const ta = $(`#q-${panel}`);
     ta.value = text;
     $(`#c-${panel}`).textContent = `${text.length}/300`;
-    if (panel === "rule") ruleRespond(text);
-    else if (!$("#b-ai").disabled) aiRespond(text);
+    if (panel === "rule") ruleRespond(text, log);
+    else if (!$("#b-ai").disabled) aiRespond(text, log);
   }
   for (const panel of ["rule", "ai"]) {
     $(`#p-${panel}`).addEventListener("click", (e) => {
@@ -603,7 +664,7 @@ JSON 하나만 답한다:
         return;
       }
       const b = el.closest("button[data-q]");
-      if (b) fillAndRun(panel, b.dataset.q ?? "");
+      if (b) fillAndRun(panel, b.dataset.q ?? "", true);
     });
   }
   function setPicked(name) {
@@ -645,9 +706,66 @@ JSON 하나만 답한다:
     TABS[next][0].focus();
   });
   addEventListener("hashchange", () => show(location.hash.slice(1)));
+  // 피드백 (Supabase 연결 시에만 보여요)
+  var rating = 0;
+  function renderStars() {
+    const box = $("#fb-stars");
+    box.querySelectorAll("label").forEach((l) => l.remove());
+    for (let i = 1; i <= 5; i++) {
+      const l = document.createElement("label");
+      l.className = i <= rating ? "on" : "";
+      l.innerHTML = `<input type="radio" name="fb-r" value="${i}"${i === rating ? " checked" : ""}><span aria-hidden="true">★</span>`;
+      l.title = lang === "en" ? `${i} / 5` : `${i}점`;
+      l.querySelector("input").setAttribute("aria-label", l.title);
+      box.append(l);
+    }
+  }
+  $("#fb-stars").addEventListener("change", (e) => {
+    rating = Number(e.target.value) || 0;
+    $("#fb-stars").querySelectorAll("label").forEach((l, i) => l.classList.toggle("on", i < rating));
+  });
+  $("#fb").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("#fb-msg").value.trim();
+    const outEl = $("#fb-out");
+    if (!rating && !msg) {
+      outEl.textContent = t("fbEmpty");
+      return;
+    }
+    const btn = $("#fb button[type=submit]");
+    btn.disabled = true;
+    const ok = await cloud.feedback({ rating, message: msg, lang });
+    btn.disabled = false;
+    outEl.textContent = ok ? t("fbThanks") : t("fbFail");
+    if (ok) {
+      rating = 0;
+      $("#fb-msg").value = "";
+      renderStars();
+    }
+  });
+  if (cloud.enabled) {
+    $("#fb").hidden = false;
+    $("#privacy").hidden = false;
+  }
+
   show(location.hash.slice(1));
   applyLang();
   fillAndRun("rule", EXAMPLES_KO[0]);
+  cloud.visit(lang);
+
+  // 관리자 페이지에서 고친 책 목록을 불러와요 (실패하면 기본 목록 그대로)
+  if (cloud.enabled) {
+    cloud.books().then((rows) => {
+      if (!rows) return;
+      const fresh = rows.map((r) => ({
+        id: r.id, title: r.title, author: r.author, category: r.category, mood: r.mood, note: r.note,
+        keywords: Array.isArray(r.keywords) ? r.keywords : [], emoji: r.emoji || "📘", cover_url: r.cover_url || ""
+      }));
+      BOOKS.length = 0;
+      BOOKS.push(...fresh);
+      if (lastRule) ruleRespond(lastRule);
+    });
+  }
 })();
 
 </script>
