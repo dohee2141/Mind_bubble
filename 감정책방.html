@@ -168,6 +168,63 @@ form button:disabled{opacity:.5;cursor:default}
 .fb button:disabled{opacity:.5;cursor:default}
 .fb .msg{font-size:.86rem;color:var(--muted);margin:0}
 .privacy{margin:0;text-align:center;font-size:.78rem;color:var(--muted)}
+/* 버전2: '쪽지 도착' 알림 + 인용 카드 쪽지 */
+:root{--paper:#fffaf0;--paper-line:rgba(10,46,112,.07);--paper-ink:#2f3a46}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#2e2928;--paper-line:rgba(255,255,255,.05);--paper-ink:#efe6e2}}
+:root[data-theme="dark"]{--paper:#2e2928;--paper-line:rgba(255,255,255,.05);--paper-ink:#efe6e2}
+.note-toast{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--accent);border-radius:999px;padding:4px 4px 4px 6px;box-shadow:0 8px 24px rgba(20,50,90,.22);zoom:var(--zoom,1);max-width:calc((100vw - 24px) / var(--zoom,1))}
+.note-toast[hidden]{display:none}
+.nt-open{display:flex;align-items:center;gap:10px;border:0;background:transparent;color:var(--ink);font:inherit;cursor:pointer;padding:6px 10px 6px 6px;border-radius:999px;text-align:left}
+.nt-ico{font-size:1.6rem;line-height:1}
+.nt-txt{display:flex;flex-direction:column;line-height:1.25}
+.nt-txt b{font-family:var(--pen);font-size:1.3rem;color:var(--accent)}
+.nt-txt small{font-size:.78rem;color:var(--muted)}
+.nt-x{width:36px;height:36px;border:0;background:transparent;color:var(--muted);font-size:1.3rem;border-radius:50%;cursor:pointer}
+.nt-x:hover,.nt-open:hover{background:var(--accent-soft)}
+@media (prefers-reduced-motion:no-preference){
+  .note-toast:not([hidden]){animation:nt-drop .5s cubic-bezier(.2,1.3,.4,1) both}
+  .note-toast:not([hidden]) .nt-ico{animation:nt-wiggle 1.4s ease-in-out .5s 2}
+  @keyframes nt-drop{from{opacity:0;transform:translate(-50%,-24px)}}
+  @keyframes nt-wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+}
+dialog.note{width:min(560px,calc(100vw - 24px));max-height:88vh;border:0;border-radius:22px;padding:0;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(10,30,60,.35);overflow:hidden}
+/* 창 크기는 화면에 맞추고, 안의 글자·카드만 확대해요 */
+.note-hd,.note-body{zoom:var(--zoom,1)}
+dialog.note[open]{display:flex;flex-direction:column}
+dialog.note::backdrop{background:rgba(10,30,55,.38);backdrop-filter:blur(2px)}
+.note-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 6px 22px}
+.note-hd h2{margin:0;font-family:var(--pen);font-weight:700;font-size:1.6rem;color:var(--hero-h)}
+.note-close{width:40px;height:40px;border:0;background:transparent;color:var(--muted);font-size:1.5rem;border-radius:50%;cursor:pointer}
+.note-close:hover{background:var(--accent-soft)}
+.note-body{overflow-y:auto;padding:4px 22px 20px}
+.note-lead{margin:0 0 12px;font-family:var(--pen);font-size:1.25rem;line-height:1.4}
+.note-lead b{color:var(--accent);font-weight:700}
+.qcards{display:grid;grid-auto-flow:column;grid-auto-columns:86%;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:thin}
+.qcard{scroll-snap-align:center;display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:250px;padding:24px 20px 18px;border-radius:16px;border:1px solid var(--line);color:var(--paper-ink);
+  background:repeating-linear-gradient(180deg,transparent 0 31px,var(--paper-line) 31px 32px),var(--paper);box-shadow:0 4px 14px rgba(20,50,90,.10)}
+.qcard .q{margin:0;font-family:var(--pen);font-size:1.4rem;line-height:1.6;white-space:pre-line;letter-spacing:-.02em}
+.qcard .who{margin:0;font-size:.85rem;color:var(--muted)}
+.qcard .who b{color:var(--ink);font-weight:600}
+.qbtn{align-self:flex-start;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font:inherit;font-size:.86rem;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;min-height:40px}
+.qbtn:hover{background:var(--accent);color:var(--accent-ink)}
+.qdots{display:flex;justify-content:center;gap:6px;margin:2px 0 8px}
+.qdots span{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.qdots span.on{background:var(--accent)}
+.note-hint{margin:0;text-align:center;font-size:.78rem;color:var(--muted)}
+.au-back{border:0;background:transparent;color:var(--accent);font:inherit;font-weight:600;padding:6px 0;cursor:pointer}
+.au-name{margin:6px 0 2px;font-family:var(--pen);font-weight:700;font-size:1.7rem;line-height:1.2}
+.au-meta{margin:0 0 8px;font-size:.82rem;color:var(--muted)}
+.au-intro{margin:0 0 14px;font-size:.92rem}
+.works{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.works li{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.works .wt{margin:0;font-weight:600}
+.works .wy{font-size:.78rem;color:var(--muted);font-weight:400;margin-left:4px}
+.works .wd{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+.works .badge{display:inline-block;margin-top:6px;font-size:.72rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px}
+.works a{flex:none;font-size:.82rem;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:8px 10px;border-radius:999px;white-space:nowrap}
+.works a:hover{border-color:var(--accent)}
+.note-foot{margin:14px 0 0;font-size:.74rem;color:var(--muted);text-align:center}
+@media (max-width:520px){.note-hd{padding:12px 10px 4px 16px}.note-body{padding:4px 14px 16px}.qcards{grid-auto-columns:92%}.qcard{padding:18px 14px 14px;min-height:220px}.works li{flex-direction:column;align-items:flex-start}}
 @media (prefers-reduced-motion:no-preference){.result>*{animation:rise .3s ease both}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
 /* 버전2: 편지처럼 말을 거는 문장은 손글씨(Gaegu), 제목은 굵고 동글한 Jua + 유리처럼 투명한 그림자 효과.
    버튼·입력칸·작은 안내·책 제목은 읽기 쉽게 기존 글꼴 그대로. 둘 다 Google Fonts(SIL OFL)라 무료로 써도 돼요. */
@@ -263,11 +320,21 @@ form button:disabled{opacity:.5;cursor:default}
   <button type="button" id="zoom-reset" aria-label="기본 크기로" title="기본 크기로"><span id="zoom-val">100%</span></button>
   <button type="button" id="zoom-in" aria-label="글자 크게" title="글자 크게">가<span aria-hidden="true">+</span></button>
 </div>
+<!-- 버전2: 고민을 적을 때마다 오는 '쪽지 도착' 알림과 인용 카드 쪽지 -->
+<div class="note-toast" id="note-toast" role="status" aria-live="polite" hidden>
+  <button type="button" class="nt-open" id="note-open"><span class="nt-ico" aria-hidden="true">💌</span><span class="nt-txt"><b data-i18n="noteArrived">쪽지 도착</b><small data-i18n="noteSub">작가들이 보낸 문장 3장</small></span></button>
+  <button type="button" class="nt-x" id="note-dismiss" aria-label="닫기">×</button>
+</div>
+<dialog class="note" id="note" aria-labelledby="note-h">
+  <div class="note-hd"><h2 id="note-h"><span aria-hidden="true">📮 </span><span data-i18n="noteArrived">쪽지 도착</span></h2><button type="button" class="note-close" id="note-close" aria-label="닫기">×</button></div>
+  <div class="note-body" id="note-body"></div>
+</dialog>
 <!-- 직접 합성한 저작권 없는 BGM (32초 반복) -->
 <audio id="bgm-audio" src="calm-bgm.wav" loop preload="auto"></audio>
 
 <script src="mb-config.js"></script>
 <script src="mb-cloud.js"></script>
+<script src="quotes.js"></script>
 <script>
 "use strict";
 (() => {
@@ -453,6 +520,17 @@ form button:disabled{opacity:.5;cursor:default}
       docTitle: "마음버블서점 - 당신의 마음을 비우고 채우다",
       sub: "당신의 마음을 비우고 채우다",
       desc: "마음을 비우고, 원하는 만큼 채워가세요.",
+      noteArrived: "쪽지 도착",
+      noteSub: "작가들이 보낸 문장 3장",
+      noteLead: "{e}에 가까운 오늘의 마음에게, 작가들이 보낸 문장이에요.",
+      noteLeadAny: "오늘의 마음에게, 작가들이 보낸 문장이에요.",
+      noteSwipe: "옆으로 넘겨 다른 쪽지도 읽어 보세요",
+      noteAuthorBooks: "{a}의 책 보기 →",
+      noteBack: "← 쪽지로 돌아가기",
+      noteKyobo: "교보문고에서 찾기 ↗",
+      noteInShop: "마음버블서점 추천 책",
+      noteClose: "닫기",
+      noteFoot: "외국 작가의 문장은 마음버블서점이 우리말로 옮겼어요.",
       zoomGroup: "글자 크기",
       zoomOut: "글자 작게",
       zoomIn: "글자 크게",
@@ -504,6 +582,17 @@ form button:disabled{opacity:.5;cursor:default}
       docTitle: "Maeum Bubble Books - Empty your mind, fill it back up",
       sub: "Empty your mind, then fill it back up",
       desc: "Let go of what weighs on you, and fill up as much as you like.",
+      noteArrived: "A note arrived",
+      noteSub: "3 lines from writers",
+      noteLead: "For a heart close to {e} today, here are lines from writers.",
+      noteLeadAny: "For your heart today, here are lines from writers.",
+      noteSwipe: "Swipe to read the other notes",
+      noteAuthorBooks: "Books by {a} →",
+      noteBack: "← Back to the note",
+      noteKyobo: "Find at Kyobo ↗",
+      noteInShop: "In our picks",
+      noteClose: "Close",
+      noteFoot: "Quotes from non-Korean writers were translated into Korean by Maeum Bubble Books.",
       zoomGroup: "Text size",
       zoomOut: "Smaller text",
       zoomIn: "Larger text",
@@ -646,7 +735,10 @@ form button:disabled{opacity:.5;cursor:default}
       books = defaults().map((book) => ({ book, why: book.note }));
       out.innerHTML = `<div class="soft"><p>${esc(t("unknown"))}</p><div class="chips">${chipsHTML(NINE.map((n) => ({ label: emo(n), q: n })))}</div></div><p class="mood">${esc(t("howAbout"))}</p>` + cardsHTML(books);
     }
-    if (log) track("rule", input, found.map((f) => f.emotion), books);
+    if (log) {
+      track("rule", input, found.map((f) => f.emotion), books);
+      sendNote(found.map((f) => f.emotion));
+    }
   }
   var samplePromise = null;
   function getSample() {
@@ -707,7 +799,10 @@ JSON 하나만 답한다:
       if (!emotion) {
         const books = defaults().map((book) => ({ book, why: book.note }));
         out.innerHTML = `<div class="soft"><p>${esc(t("noEmotion"))}</p></div><p class="mood">${esc(t("howAbout"))}</p>` + cardsHTML(books);
-        if (log) track("ai", input, [], books);
+        if (log) {
+          track("ai", input, [], books);
+          sendNote([]);
+        }
       } else {
         const picked = [];
         for (const b of Array.isArray(res?.books) ? res.books : []) {
@@ -720,7 +815,10 @@ JSON 하나만 답한다:
           if (picked.length < 3 && !picked.some((p) => p.book.id === r.book.id)) picked.push({ book: r.book, why: r.book.note });
         }
         out.innerHTML = moodHTML(esc(emotion) + (secondary.length ? ", " + secondary.map(esc).join(", ") : "")) + (read ? `<p class="read">${esc(read)}</p>` : "") + cardsHTML(picked);
-        if (log) track("ai", input, [emotion, ...secondary], picked);
+        if (log) {
+          track("ai", input, [emotion, ...secondary], picked);
+          sendNote([emotion, ...secondary]);
+        }
       }
     } catch (e) {
       const code = e?.code ?? "";
@@ -760,6 +858,7 @@ JSON 하나만 답한다:
     if (bgm) bgmLabel();
     if (themeBtn) themeLabel();
     if (zoomCtl) zoomLabels();
+    if (noteDlg) noteLabels();
   }
   document.querySelectorAll("[data-lang]").forEach(
     (b) => b.addEventListener("click", () => {
@@ -892,6 +991,115 @@ JSON 하나만 답한다:
   show(location.hash.slice(1));
 
   // 버전2: BGM (자동재생 시도 → 브라우저가 막으면 첫 클릭·키 입력 때 시작, 끄면 다음 방문에도 꺼진 채로)
+  // 버전2: '쪽지 도착' — 고민을 적을 때마다 그 마음에 맞는 작가·철학자의 문장 카드 3장(전체 100장 중)을 보내요.
+  var QDATA = window.MB_QUOTES;
+  var noteDlg = $("#note");
+  var noteToast = $("#note-toast");
+  var noteBody = $("#note-body");
+  var noteState = null; // { emotions, picks: [인용 번호] }
+  var noteTimer = 0;
+  var tf = (k, v) => t(k).replace(/\{(\w)\}/g, (_, n) => v[n] ?? "");
+  function recentQuotes() {
+    try {
+      return JSON.parse(sessionStorage.getItem("mb-qrecent") || "[]");
+    } catch {
+      return [];
+    }
+  }
+  function pickQuotes(emotions) {
+    const recent = recentQuotes();
+    const scored = QDATA.quotes.map((q, i) => {
+      let s = Math.random() * 0.9;
+      emotions.forEach((e, k) => {
+        if (q[3].includes(e)) s += k === 0 ? 3 : 1.5;
+      });
+      if (recent.includes(i)) s -= 2.5;
+      return { i, s, a: q[0] };
+    }).sort((x, y) => y.s - x.s);
+    const picks = [], authors = new Set();
+    for (const c of scored) {
+      if (picks.length === 3) break;
+      if (authors.has(c.a)) continue;
+      authors.add(c.a);
+      picks.push(c.i);
+    }
+    try {
+      sessionStorage.setItem("mb-qrecent", JSON.stringify([...picks, ...recent].slice(0, 15)));
+    } catch {
+    }
+    return picks;
+  }
+  function sendNote(emotions) {
+    if (!QDATA || !noteDlg) return;
+    noteState = { emotions: emotions.filter(Boolean), picks: pickQuotes(emotions.filter(Boolean)) };
+    noteToast.hidden = true;
+    void noteToast.offsetWidth; // 알림 애니메이션을 다시 시작해요
+    noteToast.hidden = false;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => noteToast.hidden = true, 15e3);
+  }
+  function noteLabels() {
+    for (const el of [$("#note-dismiss"), $("#note-close")]) el.setAttribute("aria-label", t("noteClose"));
+    if (noteDlg.open) noteState?.author ? showAuthor(noteState.author) : showCards();
+  }
+  function showCards() {
+    noteState.author = null;
+    const em = noteState.emotions.slice(0, 2).map((e) => `<b>${esc(emo(e))}</b>`).join(", ");
+    const cards = noteState.picks.map((i) => {
+      const [aid, text, src] = QDATA.quotes[i];
+      const a = QDATA.authors[aid];
+      const q = text.replace(/ \/\/ /g, "\n\n").replace(/ \/ /g, "\n");
+      return `<article class="qcard"><p class="q">${esc(q)}</p><div><p class="who">— <b>${esc(a.name)}</b>, 『${esc(src.replace(/^[「『]|[」』]$/g, ""))}』</p></div>
+        <button type="button" class="qbtn" data-author="${esc(aid)}">${esc(tf("noteAuthorBooks", { a: a.name }))}</button></article>`;
+    }).join("");
+    noteBody.innerHTML = `<p class="note-lead">${em ? tf("noteLead", { e: em }) : esc(t("noteLeadAny"))}</p>
+      <div class="qcards" id="qcards" tabindex="0" aria-roledescription="carousel">${cards}</div>
+      <div class="qdots" aria-hidden="true">${noteState.picks.map((_, k) => `<span class="${k ? "" : "on"}"></span>`).join("")}</div>
+      <p class="note-hint">${esc(t("noteSwipe"))}</p><p class="note-foot">${esc(t("noteFoot"))}</p>`;
+    const strip = $("#qcards");
+    strip.addEventListener("scroll", () => {
+      const w = strip.firstElementChild?.getBoundingClientRect().width || 1;
+      const k = Math.round(strip.scrollLeft / (w + 12));
+      noteBody.querySelectorAll(".qdots span").forEach((d, j) => d.classList.toggle("on", j === k));
+    });
+  }
+  function showAuthor(aid) {
+    const a = QDATA.authors[aid];
+    if (!a) return;
+    noteState.author = aid;
+    const works = a.books.map(([title, year, desc, bookId]) => {
+      const inShop = bookId && BOOKS.some((b) => b.id === bookId);
+      const url = "https://search.kyobobook.co.kr/search?keyword=" + encodeURIComponent(`${title} ${a.name}`);
+      return `<li><div><p class="wt">『${esc(title)}』<span class="wy">${esc(year)}</span></p><p class="wd">${esc(desc)}</p>${inShop ? `<span class="badge">${esc(t("noteInShop"))}</span>` : ""}</div>
+        <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t("noteKyobo"))}</a></li>`;
+    }).join("");
+    noteBody.innerHTML = `<button type="button" class="au-back" id="au-back">${esc(t("noteBack"))}</button>
+      <h3 class="au-name">${esc(a.name)}</h3><p class="au-meta">${esc(a.orig)} · ${esc(a.years)}</p><p class="au-intro">${esc(a.intro)}</p>
+      <ul class="works">${works}</ul>`;
+    noteBody.scrollTop = 0;
+    $("#au-back").focus();
+  }
+  if (noteDlg) {
+    $("#note-open").addEventListener("click", () => {
+      if (!noteState) return;
+      noteToast.hidden = true;
+      clearTimeout(noteTimer);
+      showCards();
+      noteDlg.showModal();
+    });
+    $("#note-dismiss").addEventListener("click", () => {
+      noteToast.hidden = true;
+      clearTimeout(noteTimer);
+    });
+    $("#note-close").addEventListener("click", () => noteDlg.close());
+    noteDlg.addEventListener("click", (e) => {
+      if (e.target === noteDlg) noteDlg.close(); // 바깥 어두운 곳을 누르면 닫혀요
+      const b = e.target.closest?.("button[data-author]");
+      if (b) showAuthor(b.dataset.author);
+      if (e.target.closest?.("#au-back")) showCards();
+    });
+  }
+
   // 버전2: 글자 크기(확대 비율) 버튼 — 100% · 115% · 130% · 150%, 선택은 다음 방문에도 기억
   var zoomCtl = $("#zoom-ctl");
   var ZOOMS = [1, 1.15, 1.3, 1.5];
