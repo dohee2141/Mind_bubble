@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>마음버블서점 관리자</title>
+<script>/* 저장해 둔 밝은/다크 모드를 먼저 적용해요(서점 화면과 같은 설정) */try{var mbT=localStorage.getItem("mb-theme");if(mbT==="light"||mbT==="dark")document.documentElement.dataset.theme=mbT}catch(e){}</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gaegu:wght@400;700&family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{
   --bg:#fdf8f5; --surface:#ffffff; --ink:#3a302d; --ink2:#5e524e; --muted:#8a7d78; --line:#f0e4de; --grid:#f3ebe7;
@@ -104,13 +105,51 @@ dialog form{padding:18px;display:flex;flex-direction:column;gap:10px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:520px){.two{grid-template-columns:1fr}}
 .switch{display:flex;gap:8px;align-items:center;cursor:pointer}
+/* ───── 버전2 디자인: 서점 화면과 같은 윤슬 강물 배경 · 구름 · 유리 제목 · 손글씨 ───── */
+:root{--river:#cfe7f6;--on-river:#33414d;--pen:"Gaegu","Gowun Dodum","Noto Sans KR",cursive;
+  --title-top:rgba(96,150,222,.62);--title-bottom:rgba(6,27,66,.92);--title-edge:rgba(255,255,255,.75);--title-shadow:rgba(20,60,110,.28);
+  --glass:rgba(255,255,255,.86);--hero-sub:#0a2e70}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--river:#0e2438;--on-river:#dbe7f2;
+  --title-top:rgba(255,255,255,.96);--title-bottom:rgba(165,195,240,.72);--title-edge:rgba(255,255,255,.28);--title-shadow:rgba(0,0,0,.5);
+  --glass:rgba(41,35,35,.88);--hero-sub:#b3c6f0}}
+:root[data-theme="dark"]{--river:#0e2438;--on-river:#dbe7f2;
+  --title-top:rgba(255,255,255,.96);--title-bottom:rgba(165,195,240,.72);--title-edge:rgba(255,255,255,.28);--title-shadow:rgba(0,0,0,.5);
+  --glass:rgba(41,35,35,.88);--hero-sub:#b3c6f0}
+#river{position:fixed;inset:0;width:100%;height:100%;z-index:-1;display:block;pointer-events:none}
+body{background:var(--river);padding-top:64px}
+.card,nav.tabs,.seg{background:var(--glass);backdrop-filter:blur(6px)}
+h1.glass{font-family:"Jua",var(--sans);font-size:2rem;letter-spacing:.04em;line-height:1.2;
+  background:linear-gradient(180deg,var(--title-top) 0%,var(--title-bottom) 78%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1px var(--title-edge);filter:drop-shadow(0 2px 1px var(--title-shadow)) drop-shadow(0 6px 10px var(--title-shadow))}
+h2{font-family:var(--pen);font-weight:700;font-size:1.35rem;letter-spacing:-.01em}
+.kpi .v{font-family:"Jua",var(--sans)}
+header.top{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;backdrop-filter:blur(6px)}
+header.top #who{color:var(--ink2)}
+.brand{display:flex;align-items:center;gap:10px}
+.cloud-sm{width:72px;height:auto;filter:drop-shadow(0 6px 8px rgba(40,90,140,.22))}
+.cloud-lg{display:block;width:200px;height:auto;margin:-70px auto -4px;filter:drop-shadow(0 16px 14px rgba(40,90,140,.22))}
+#login{margin-top:12vh;overflow:visible}
+#login h1{text-align:center}
+@media (prefers-reduced-motion:no-preference){.cloud-lg{animation:cloud-float 8s ease-in-out infinite}@keyframes cloud-float{0%,100%{transform:translate(0,0)}50%{transform:translate(5px,-7px)}}}
+/* 왼쪽 위 밝은/다크 모드 버튼 */
+.theme{position:fixed;top:16px;left:16px;z-index:20;display:inline-grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);background:var(--surface);color:var(--hero-sub);border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.1);padding:0}
+.theme:hover{border-color:var(--accent)}
+.theme .i-sun{display:none;color:#f2c14e}
+.theme[data-mode="dark"] .i-sun{display:block}
+.theme[data-mode="dark"] .i-moon{display:none}
 </style>
 </head>
 <body>
+<canvas id="river" aria-hidden="true"></canvas>
+<button type="button" class="theme" id="theme-toggle" aria-label="다크 모드로 바꾸기" title="다크 모드로 바꾸기">
+  <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z" fill="currentColor"/></svg>
+  <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></g></svg>
+</button>
 <main>
   <!-- 로그인 -->
   <section id="login" class="card" hidden>
-    <h1>관리자 로그인</h1>
+    <img class="cloud-lg" src="cloud.svg" alt="" width="200" height="120">
+    <h1 class="glass">관리자 로그인</h1>
     <p id="login-note" class="muted small"></p>
     <form id="login-form" class="row" style="flex-direction:column;align-items:stretch;gap:10px">
       <label class="f">이메일<input type="email" id="login-email" autocomplete="username" required></label>
@@ -131,7 +170,7 @@ dialog form{padding:18px;display:flex;flex-direction:column;gap:10px}
   <div id="app" hidden>
     <header class="top">
       <div>
-        <h1>마음버블서점 관리자</h1>
+        <div class="brand"><img class="cloud-sm" src="cloud.svg" alt="" width="72" height="43"><h1 class="glass">마음버블서점 관리자</h1></div>
         <p class="muted small" id="who"></p>
       </div>
       <div class="row">
@@ -259,6 +298,30 @@ dialog form{padding:18px;display:flex;flex-direction:column;gap:10px}
   </form>
 </dialog>
 
+<script src="river.js"></script>
+<script>
+// 버전2: 밝은/다크 모드 버튼 (서점 화면과 같은 mb-theme 설정을 함께 써요)
+(() => {
+  const btn = document.getElementById("theme-toggle");
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const root = document.documentElement;
+  const dark = () => root.dataset.theme === "dark" || (root.dataset.theme !== "light" && mq.matches);
+  const label = () => {
+    const d = dark();
+    btn.dataset.mode = d ? "dark" : "light";
+    btn.title = d ? "밝은 모드로 바꾸기" : "다크 모드로 바꾸기";
+    btn.setAttribute("aria-label", btn.title);
+  };
+  btn.addEventListener("click", () => {
+    const next = dark() ? "light" : "dark";
+    root.dataset.theme = next;
+    try { localStorage.setItem("mb-theme", next); } catch {}
+    label();
+  });
+  mq.addEventListener("change", label);
+  label();
+})();
+</script>
 <script src="mb-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
