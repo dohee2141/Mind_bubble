@@ -5,12 +5,12 @@
 
 ## 🔗 바로 가기
 
-| 사이트 | 주소 |
+| 페이지 | 주소 |
 |---|---|
-| GitHub Pages | **https://mind-bubble-rest.github.io/** |
-| Firebase Hosting | **https://mind-bubble-rest.web.app** |
+| 마음버블서점 | **https://mind-bubble-rest.web.app** |
+| 관리자 페이지 | https://mind-bubble-rest.web.app/admin.html (로그인 필요) |
 
-두 주소 모두 같은 최신 버전이에요.
+사이트는 Firebase Hosting에서 운영해요. (예전 GitHub Pages 주소는 닫았어요)
 
 ## ✨ 주요 기능
 
@@ -41,9 +41,9 @@
 
 ## 🚀 배포 방법
 
-`main` 브랜치에 올리면 **GitHub Pages**에는 1~2분 안에 자동으로 반영돼요.
+`main` 브랜치에 올리면 GitHub Actions가 **Firebase Hosting**에 자동으로 배포해요. (`.github/workflows/firebase-hosting.yml`)
 
-**Firebase Hosting**에는 아래 명령으로 올려요. (Windows PowerShell에서는 `npx.cmd`를 써요)
+직접 올리고 싶을 때는 아래 명령을 써요. (Windows PowerShell에서는 `npx.cmd`를 써요)
 
 ```bash
 npx.cmd -y firebase-tools deploy --only hosting --project mind-bubble-rest

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mind-bubble-rest.github.io/sitemap.xml
+Sitemap: https://mind-bubble-rest.web.app/sitemap.xml
